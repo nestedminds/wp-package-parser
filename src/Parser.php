@@ -53,7 +53,7 @@ class Parser {
 			$depth = substr_count($fileName, '/');
 
 			//Skip empty files, directories and everything that's more than 1 sub-directory deep.
-			if ( ($depth > 1) || ($info['size'] == 0) ) {
+			if ( ($depth > 2) || ($info['size'] == 0) ) {
 				continue;
 			}
 
@@ -147,7 +147,7 @@ class Parser {
 			'Tags' => 'tags',
 			'Requires at least' => 'requires',
 			'Tested up to' => 'tested',
-			'Stable tag' => 'stable',
+			'Stable tag' => 'stable'
 		);
 		do { //Parse each readme.txt header
 			$pieces = explode(':', array_shift($lines), 2);
@@ -254,14 +254,17 @@ class Parser {
 		//[Internal name => Name used in the plugin file]
 		$pluginHeaderNames = array(
 			'Name' => 'Plugin Name',
-			'PluginURI' => 'Plugin URI',
+			'Plugin URI' => 'Plugin URI',
 			'Version' => 'Version',
 			'Description' => 'Description',
 			'Author' => 'Author',
-			'AuthorURI' => 'Author URI',
-			'TextDomain' => 'Text Domain',
-			'DomainPath' => 'Domain Path',
+			'Author URI' => 'Author URI',
+			'Text Domain' => 'Text Domain',
+			'Domain Path' => 'Domain Path',
 			'Network' => 'Network',
+			'Requires PHP' => 'Requires PHP',
+			'Requires at least' => 'Requires at least',
+			'Tested up to' => 'Tested up to',
 			//Site Wide Only is deprecated in favor of Network.
 			'_sitewide' => 'Site Wide Only',
 		);
