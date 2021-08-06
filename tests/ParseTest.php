@@ -31,20 +31,23 @@ final class ParseTest extends TestCase
     public function testDoesParsePlugin()
     {
     	$filepath = __DIR__ . '/resources/test-plugin.zip';
-
-    	$result = Parser::parse($filepath);
+		$parser = new Parser();
+    	$result = $parser->parse($filepath);
     	$this->assertEquals($result, [
     		'header' => [
     			'Name' => 'Test Plugin',
-    			'PluginURI'=> 'https://testplugin.com',
+    			'Plugin URI'=> 'https://testplugin.com',
 			    'Version'=> '1.5.1',
 			    'Description' => 'A parser test plugin.',
 			    'Author' => 'Capevace',
-			    'AuthorURI' => 'https://github.com/Capevace',
-			    'TextDomain' => 'test-plugin-domain',
-			    'DomainPath' => '',
+			    'Author URI' => 'https://github.com/Capevace',
+			    'Text Domain' => 'test-plugin-domain',
+			    'Domain Path' => '',
 			    'Network' => false,
-			    'Title' => 'Test Plugin'
+			    'Title' => 'Test Plugin',
+				'Requires PHP' => '7.2',
+				'Requires at least' => '3.8',
+				'Tested up to' => '4.9'
 			],
     		'readme' => $this->getReadmeExampleData(),
     		'pluginFile' => 'test-plugin/test-plugin.php',
@@ -56,8 +59,8 @@ final class ParseTest extends TestCase
     public function testDoesParseTheme()
     {
     	$filepath = __DIR__ . '/resources/test-theme.zip';
-
-    	$result = Parser::parse($filepath);
+		$parser = new Parser();
+    	$result = $parser->parse($filepath);
     	
     	$this->assertEquals($result, [
     		'header' => [
@@ -72,8 +75,8 @@ final class ParseTest extends TestCase
 			    'Template' => '',
 			    'Status' => '',
 			    'DetailsURI' => '',
-			    'Tags' => ['one', 'two']
-			],
+			    'Tags' => ['one', 'two'],
+ 			],
     		'readme' => $this->getReadmeExampleData(),
     		'pluginFile' => null,
     		'stylesheet' => 'test-theme/style.css',

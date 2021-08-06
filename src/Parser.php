@@ -11,7 +11,7 @@ class Parser {
 	 * Returns an associative array with these keys:
 	 *  'type'   - Detected package type. This can be either "plugin" or "theme".
 	 * 	'header' - An array of plugin or theme headers. See get_plugin_data() or WP_Theme for details.
-	 *  'readme' - An array of metadata extracted from readme.txt. @see self::parseReadme()
+	 *  'readme' - An array of metadata extracted from readme.txt. @see $this->parseReadme()
 	 * 	'pluginFile' - The name of the PHP file where the plugin headers were found relative to the root directory of the ZIP archive.
 	 * 	'stylesheet' - The relative path to the style.css file that contains theme headers, if any.
 	 *
@@ -23,7 +23,7 @@ class Parser {
 	 * @param bool $applyMarkdown Whether to transform markup used in readme.txt to HTML. Defaults to false.
 	 * @return array Either an associative array or FALSE if the input file is not a valid ZIP archive or doesn't contain a WP plugin or theme.
 	 */
-	public static function parse($packageFilename, $applyMarkdown = false){
+	public function parse($packageFilename, $applyMarkdown = false){
 		if ( !file_exists($packageFilename) || !is_readable($packageFilename) ){
 			return false;
 		}
@@ -60,13 +60,13 @@ class Parser {
 			//readme.txt (for plugins)?
 			if ( empty($readme) && (strtolower(basename($fileName)) == 'readme.txt') ){
 				//Try to parse the readme.
-				$readme = self::parseReadme($zip->getFromIndex($fileIndex), $applyMarkdown);
+				$readme = $this->parseReadme($zip->getFromIndex($fileIndex), $applyMarkdown);
 			}
 
 			//Theme stylesheet?
 			if ( empty($header) && (strtolower(basename($fileName)) == 'style.css') ) {
 				$fileContents = substr($zip->getFromIndex($fileIndex), 0, 8*1024);
-				$header = self::getThemeHeaders($fileContents);
+				$header = $this->getThemeHeaders($fileContents);
 				if ( !empty($header) ){
 					$stylesheet = $fileName;
 					$type = 'theme';
@@ -76,7 +76,7 @@ class Parser {
 			//Main plugin file?
 			if ( empty($header) && ($extension === 'php') ){
 				$fileContents = substr($zip->getFromIndex($fileIndex), 0, 8*1024);
-				$header = self::getPluginHeaders($fileContents);
+				$header = $this->getPluginHeaders($fileContents);
 				if ( !empty($header) ){
 					$pluginFile = $fileName;
 					$type = 'plugin';
@@ -116,7 +116,7 @@ class Parser {
 	 * @param bool $applyMarkdown Whether to transform Markdown used in readme.txt sections to HTML. Defaults to false.
 	 * @return array|null Associative array, or NULL if the input isn't a valid readme.txt file.
 	 */
-	public static function parseReadme($readmeTxtContents, $applyMarkdown = false){
+	public function parseReadme($readmeTxtContents, $applyMarkdown = false){
 		$readmeTxtContents = trim($readmeTxtContents, " \t\n\r");
 		$readme = array(
 			'name' => '',
@@ -222,7 +222,7 @@ class Parser {
 	 * @param string $text
 	 * @return string
 	 */
-	private static function applyMarkdown($text){
+	private function applyMarkdown($text){
 		//The WP standard for readme files uses some custom markup, like "= H4 headers ="
 		$text = preg_replace('@^\s*=\s*(.+?)\s*=\s*$@m', "<h4>$1</h4>\n", $text);
 		return Markdown::defaultTransform($text);
@@ -250,7 +250,7 @@ class Parser {
 	 * @param string $fileContents Contents of the plugin file
 	 * @return array|null See above for description.
 	 */
-	public static function getPluginHeaders($fileContents) {
+	public function getPluginHeaders($fileContents) {
 		//[Internal name => Name used in the plugin file]
 		$pluginHeaderNames = array(
 			'Name' => 'Plugin Name',
@@ -269,7 +269,7 @@ class Parser {
 			'_sitewide' => 'Site Wide Only',
 		);
 
-		$headers = self::getFileHeaders($fileContents, $pluginHeaderNames);
+		$headers = $this->getFileHeaders($fileContents, $pluginHeaderNames);
 
 		//Site Wide Only is the old header for Network.
 		if ( empty($headers['Network']) && !empty($headers['_sitewide']) ) {
@@ -312,7 +312,7 @@ class Parser {
 	 * @param string $fileContents Contents of the theme stylesheet.
 	 * @return array|null See above for description.
 	 */
-	public static function getThemeHeaders($fileContents) {
+	public function getThemeHeaders($fileContents) {
 		$themeHeaderNames = array(
 			'Name'        => 'Theme Name',
 			'ThemeURI'    => 'Theme URI',
@@ -327,7 +327,7 @@ class Parser {
 			'DomainPath'  => 'Domain Path',
 			'DetailsURI'   => 'Details URI',
 		);
-		$headers = self::getFileHeaders($fileContents, $themeHeaderNames);
+		$headers = $this->getFileHeaders($fileContents, $themeHeaderNames);
 
 		$headers['Tags'] = array_filter(array_map('trim', explode(',', strip_tags( $headers['Tags']))));
 
@@ -350,7 +350,7 @@ class Parser {
 	 * @param array $headerMap The list of headers to search for in the file.
 	 * @return array
 	 */
-	public static function getFileHeaders($fileContents, $headerMap ) {
+	public function getFileHeaders($fileContents, $headerMap ) {
 		$headers = array();
 
 		//Support systems that use CR as a line ending.

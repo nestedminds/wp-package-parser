@@ -6,6 +6,9 @@
  * Author: Capevace
  * Author URI: https://github.com/Capevace
  * Version: 1.5.1
+ * Requires PHP: 7.2
+ * Tested up to: 4.9
+ * Requires at least: 3.8
  * Text Domain: test-plugin-domain
  *
  * Copyright: (c) 2018 Capevace
